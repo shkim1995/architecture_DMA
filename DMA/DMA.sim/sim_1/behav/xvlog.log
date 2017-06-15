@@ -183,7 +183,7 @@ WARNING: [VRFC 10-756] identifier dma_command_addr is used before its declaratio
 WARNING: [VRFC 10-756] identifier dma_command_len is used before its declaration [/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sources_1/imports/sources_1/imports/srcs/cpu.v:261]
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sim_1/imports/srcs/cpu_TB.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module cpu_TB
-INFO: [VRFC 10-2458] undeclared symbol EX_isFetched, assumed default net type wire [/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sim_1/imports/srcs/cpu_TB.v:185]
-INFO: [VRFC 10-2458] undeclared symbol IDEX_enable, assumed default net type wire [/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sim_1/imports/srcs/cpu_TB.v:186]
+INFO: [VRFC 10-2458] undeclared symbol EX_isFetched, assumed default net type wire [/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sim_1/imports/srcs/cpu_TB.v:186]
+INFO: [VRFC 10-2458] undeclared symbol IDEX_enable, assumed default net type wire [/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.srcs/sim_1/imports/srcs/cpu_TB.v:187]
 INFO: [VRFC 10-2263] Analyzing Verilog file "/home/steven/Desktop/vivado/HW7_DMA/DMA/DMA.sim/sim_1/behav/glbl.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module glbl

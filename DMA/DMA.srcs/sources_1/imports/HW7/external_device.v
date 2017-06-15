@@ -10,7 +10,7 @@
 `define DATA_SIZE 3
 `define DEVICE_BIT_LEN 2
 
-`define FIRE_TIME 134300
+`define FIRE_TIME 63500
 `define INTTERRUPT_DURATION 500
 
 module external_device(
@@ -24,9 +24,9 @@ module external_device(
         /* Randomized storage initialization.  
         * You may want to change these for the
         * debugging */
-       storage[0] <= $random;
-       storage[1] <= $random;
-       storage[2] <= $random;
+       storage[0] <= 64'h1234567890abcdef;
+       storage[1] <= 64'h0000111122223333;
+       storage[2] <= 64'haabbccddeeff0011;
 
        interrupt <= 0;
 
@@ -36,13 +36,14 @@ module external_device(
        /* Interrupt duration. You may want to change */
        #(`INTTERRUPT_DURATION);
        interrupt <=  0;
-
+        
+       #(`INTTERRUPT_DURATION*1);
        /* Randomized storage initialization.  
        * You may want to change these for the
        * debugging */
-      storage[0] <= $random;
-      storage[1] <= $random;
-      storage[2] <= $random;
+      storage[0] <= 64'h4444555566667777;
+      storage[1] <= 64'h888899990000aaaa;
+      storage[2] <= 64'hbbbbccccddddeeee;
 
        /* Another interrupt. You may want to change */
       #(`FIRE_TIME);

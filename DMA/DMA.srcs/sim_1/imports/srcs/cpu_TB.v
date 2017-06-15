@@ -69,6 +69,7 @@ module cpu_TB();
 	
 	wire i_ready;
 	wire d_ready;
+	assign cmd[33] = d_ready;
 	
 	wire[7:0] d_count;
 	

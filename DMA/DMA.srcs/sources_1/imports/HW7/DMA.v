@@ -62,6 +62,11 @@ module DMA (
     assign cmd_addr = cmd[31:16];
     assign cmd_len = cmd[15:0];
     
+    //state machine for waiting for write
+    
+    reg waitingState;
+    initial waitingState <= 0;
+    
     //cmd is on, the outputs BR
     
     always @(cmd_on) begin
@@ -74,13 +79,16 @@ module DMA (
     end
     
     always @(posedge CLK) begin
+    
+//        $display("%b", d_ready);
         
         //if cmd is in, then BR on
         
         
         //if BG is on, write on the memory
-        if(BG && len > 0) begin
+        if(!waitingState && BG && len > 0) begin
             $display("len : %d", len);
+            waitingState <= 1;
             len <= len - 4;
             addr <= startAddr;
             startAddr <= startAddr + 4;
@@ -88,7 +96,18 @@ module DMA (
             WRITE <= 1;
         end
         
-        if(BG && len <= 0) begin
+    end
+    
+    always @(d_ready) begin
+        if(d_ready && BG && len>0) begin
+            len <= len - 4;
+            addr <= startAddr;
+            startAddr <= startAddr + 4;
+            offset <= offset + 1;
+            WRITE <= 1;
+        end
+        
+        if(d_ready && BG && len <= 0) begin
             interrupt <= 1;
         end
     end
@@ -99,7 +118,7 @@ module DMA (
             BR<=0;
             interrupt <= 0;
             WRITE <= 0;
-            
+            waitingState <= 0;
             addr <= 16'bz;
             offset <= -1;
         end

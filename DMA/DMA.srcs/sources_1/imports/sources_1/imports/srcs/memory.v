@@ -6,6 +6,8 @@
 `define I_LATENCY 6
 `define D_LATENCY 6
 
+`define DMA_ADDRESS 500;
+
 module Memory(
              
              clk,
@@ -107,6 +109,7 @@ module Memory(
 	       
           d_count<=`D_LATENCY;
           d_ready<=0;
+          
 	   end
 	
 	end
@@ -122,7 +125,16 @@ module Memory(
 	
 //	always @(d_outputData) 
 //        $display("MEM :d_output, %h", d_outputData);
-
+    
+    always @(memory[500] or memory[504] or memory [508]) begin
+        
+        $display("%h %h %h %h | %h %h %h %h | %h %h %h %h", 
+        memory[500], memory[501], memory[502], memory[503], 
+        memory[504], memory[505], memory[506], memory[507], 
+        memory[508], memory[509], memory[510], memory[511]);
+    
+    end
+    
 	always@(posedge clk)
 		if(!reset_n)
 			begin
@@ -370,6 +382,7 @@ module Memory(
                    // $display("MEM : d_output %h", d_outputData);
 				 end
 				
+				//write from CPU
 				if(d_writeM[0]) begin
 				    if(d_count>0) begin
                         d_count <= d_count-1;
@@ -383,8 +396,20 @@ module Memory(
 				    
 			    end 
 			    
+			    //write from DMA
 			    if(d_writeM[1]) begin
-			         
+			         if(d_count>0) begin
+                         d_count <= d_count-1;
+                     end
+                     
+                     else if(d_count==0) begin
+                         d_ready <= 1;
+                         memory[d_address] <= d_data[63:48];
+                         memory[d_address+1] <= d_data[47:32];
+                         memory[d_address+2] <= d_data[31:16];
+                         memory[d_address+3] <= d_data[15:0];
+    //                      $display("data saved in MEMORY : %h", d_data[15:0]);
+                     end
 			    end
 			end
 			
