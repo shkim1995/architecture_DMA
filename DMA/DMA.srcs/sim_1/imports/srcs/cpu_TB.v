@@ -16,7 +16,7 @@ module cpu_TB();
 	
 	
 	wire BG;
-    wire [32:0] cmd;
+    wire [33:0] cmd;
     wire BR;
     wire [4 * `WORD_SIZE - 1 : 0] edata;
     wire dma_WRITE;
@@ -32,7 +32,7 @@ module cpu_TB();
 //    wire i_readC;
 //    wire[`WORD_SIZE-1:0] i_addrC;
 //    wire i_readyC;
-//    wire[`WORD_SIZE-1:0] i_dataC;
+//    wire[`WORD_SIZE-1:0] i_dataC;                                                                      
     
 //    wire d_readC;
 //    wire d_writeC;
@@ -50,9 +50,22 @@ module cpu_TB();
 	
 	// Data memory interface
 	wire d_readM;
-	wire d_writeM;
-	wire [`WORD_SIZE-1:0] d_address;
-	wire [`WORD_SIZE*4-1:0] d_data;
+	wire[1:0] d_writeM;
+	assign d_writeM[1] = dma_WRITE;
+	
+	wire [`WORD_SIZE-1:0] cpu_d_address;
+	wire [`WORD_SIZE*4-1:0] cpu_d_data;
+	
+	wire [`WORD_SIZE-1:0] addr;
+	wire [`WORD_SIZE*4-1:0] data;
+	
+//	assign d_address = dma_WRITE ? dma_addr : cpu_d_address;
+//	assign d_data = dma_WRITE ? dma_data : cpu_d_data;
+	
+	assign addr = dma_WRITE ? dma_addr : cpu_d_address;
+	assign data = dma_WRITE ? dma_data :
+	               d_writeM ? cpu_d_data : 64'bz;
+	assign cpu_d_data = d_readM ? data : 64'bz;
 	
 	wire i_ready;
 	wire d_ready;
@@ -94,7 +107,7 @@ module cpu_TB();
 	
 //	wire[15:0] IF_inst;
 //	wire[15:0] ID_inst;
-//    wire[15:0] EX_inst;
+    wire[15:0] EX_inst;
 //    wire[15:0] ALU_out;
     
 //    wire[15:0] ALU_in1;
@@ -119,8 +132,8 @@ module cpu_TB();
 	           
 	           .d_readM(d_readM), 
 	           .d_writeM(d_writeM), 
-	           .d_address(d_address), 
-	           .d_data(d_data), 
+	           .d_address(addr), 
+	           .d_data(data), 
 	           
 	           .i_ready(i_ready), 
 	           .d_ready(d_ready), 
@@ -154,9 +167,9 @@ module cpu_TB();
 	         .i_dataM(i_data),
 	          
 	         .d_readM(d_readM), 
-	         .d_writeM(d_writeM), 
-	         .d_addrM(d_address), 
-	         .d_dataM(d_data), 
+	         .d_writeM(d_writeM[0]), 
+	         .d_addrM(cpu_d_address), 
+	         .d_dataM(cpu_d_data), 
 
              .i_readyM(i_ready), 
              .d_readyM(d_ready), 
@@ -182,11 +195,11 @@ module cpu_TB();
 	         .dma_end_int(dma_end_int),
 	         .BR(BR),
 	         
-	         .dma_command(cmd),
+	         .dma_command(cmd[32:0]),
 	         .BG(BG),
 	         .dma_on(dma_on),
 	         
-	         .stall_all(stall_all)
+	         .stall_all(stall_all),
 	         
 	         
 //	         .IDEX_Flush(IDEX_Flush),
@@ -196,7 +209,7 @@ module cpu_TB();
 //	         .PC_enable(PC_enable),
 //	         .IF_inst(IF_inst),
 //	         .ID_inst(ID_inst),
-//             .EX_inst(EX_inst),
+             .EX_inst(EX_inst)
 //             .ALU_out(ALU_out),
 //             .ID_WWD(ID_WWD),
 //             .EX_WWD(EX_WWD),

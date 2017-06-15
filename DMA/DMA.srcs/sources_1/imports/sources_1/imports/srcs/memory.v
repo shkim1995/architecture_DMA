@@ -49,8 +49,8 @@ module Memory(
 	// Data memory interface
 	input d_readM;
 	wire d_readM;
-	input d_writeM;
-	wire d_writeM;
+	input[1:0] d_writeM;
+	wire[1:0] d_writeM;
 	input [`WORD_SIZE-1:0] d_address;
 	wire [`WORD_SIZE-1:0] d_address;
 	inout[`WORD_SIZE*4-1:0] d_data;
@@ -101,7 +101,7 @@ module Memory(
 //	output set_dready;
 //	initial set_dready<=0;
 
-	always @(d_address or d_readM or d_writeM) begin
+	always @(d_address or d_readM or d_writeM[0] or d_writeM[1]) begin
 	
 	   if(d_readM || d_writeM) begin
 	       
@@ -370,7 +370,7 @@ module Memory(
                    // $display("MEM : d_output %h", d_outputData);
 				 end
 				
-				if(d_writeM) begin
+				if(d_writeM[0]) begin
 				    if(d_count>0) begin
                         d_count <= d_count-1;
                     end
@@ -382,6 +382,10 @@ module Memory(
                     end
 				    
 			    end 
+			    
+			    if(d_writeM[1]) begin
+			         
+			    end
 			end
 			
 endmodule

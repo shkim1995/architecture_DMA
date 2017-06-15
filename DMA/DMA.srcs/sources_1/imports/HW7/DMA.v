@@ -18,7 +18,7 @@
 module DMA (
     input CLK, BG,
     input [4 * `WORD_SIZE - 1 : 0] edata,
-    input[32:0] cmd,
+    input [33:0] cmd,
     output BR, WRITE,
     output [`WORD_SIZE - 1 : 0] addr, 
     output [4 * `WORD_SIZE - 1 : 0] data,
@@ -27,19 +27,37 @@ module DMA (
 
     /* Implement your own logic */
     
+    wire [4 * `WORD_SIZE - 1 : 0] data;
+    assign data = BG ? edata : 64'bz;
+    
+    reg [`WORD_SIZE - 1 : 0] addr;
+    initial addr <= 0;
+    
+    reg WRITE;
+    initial WRITE <= 0;
+    
     reg BR;
     initial BR <= 0;
     
     reg interrupt;
     initial interrupt <= 0;
     
+    wire cmd_on;
     wire[15:0] cmd_addr;
     wire[15:0] cmd_len;
     
+    wire d_ready; // if data memory is ready
+    
+    reg[15:0] startAddr;
     reg[15:0] addr;
     reg[15:0] len;
     reg[1:0] offset;
     
+    initial addr <= 16'bz;
+    initial offset <= -1;
+    
+    //decoding cmd
+    assign d_ready = cmd[33];
     assign cmd_on = cmd[32];
     assign cmd_addr = cmd[31:16];
     assign cmd_len = cmd[15:0];
@@ -48,17 +66,14 @@ module DMA (
     
     always @(cmd_on) begin
         if(cmd_on) begin
-            addr <= cmd_addr;
+            startAddr <= cmd_addr;
             len <= cmd_len;
             BR <= 1;
+            offset <= -1;
         end
     end
     
     always @(posedge CLK) begin
-//        $display("addr : %d", cmd_addr);
-//        $display("len : %d", cmd_len);
-//        $display("%b", cmd_len==16'bz);
-//        $display("%b", cmd_addr==16'bz);
         
         //if cmd is in, then BR on
         
@@ -67,6 +82,10 @@ module DMA (
         if(BG && len > 0) begin
             $display("len : %d", len);
             len <= len - 4;
+            addr <= startAddr;
+            startAddr <= startAddr + 4;
+            offset <= offset + 1;
+            WRITE <= 1;
         end
         
         if(BG && len <= 0) begin
@@ -79,6 +98,10 @@ module DMA (
         if(!BG) begin
             BR<=0;
             interrupt <= 0;
+            WRITE <= 0;
+            
+            addr <= 16'bz;
+            offset <= -1;
         end
     end
 
